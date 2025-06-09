@@ -18,7 +18,18 @@ export async function sendEmail({ to, subject, url }: { to: string, subject: str
             from: "Students' Council: <team@example.com>", // sender address
             to: to, // list of receivers
             subject: subject, // Subject line
-            html: `<!DOCTYPE html>
+            html: getMail(url), // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    } catch (err) {
+        console.error("Error while sending mail", err);
+    }
+}
+
+function getMail(url: string) {
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -131,6 +142,54 @@ export async function sendEmail({ to, subject, url }: { to: string, subject: str
             color: #7e57c2;
         }
 
+        .contact-section {
+            background-color: #252525;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .contact-section h3 {
+            color: #f0f0f0;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-section h3::before {
+            content: "📞";
+            margin-right: 8px;
+        }
+
+        .contact-details {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .contact-item {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-item strong {
+            color: #4caf50;
+            min-width: 60px;
+            margin-right: 8px;
+        }
+
+        .contact-item a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
         .email-footer {
             background-color: #161616;
             padding: 30px;
@@ -200,6 +259,16 @@ export async function sendEmail({ to, subject, url }: { to: string, subject: str
                 display: block;
                 margin: 5px 0;
             }
+
+            .contact-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .contact-item strong {
+                min-width: auto;
+                margin-bottom: 4px;
+            }
         }
 
         @media only screen and (max-width: 480px) {
@@ -248,10 +317,29 @@ export async function sendEmail({ to, subject, url }: { to: string, subject: str
         ${url}
                 </div>
             </div>
+
+            <div class="contact-section">
+                <h3>Need Help?</h3>
+                <div class="contact-details">
+                    <p>If you're having trouble with email verification or need assistance, feel free to reach out:</p>
+                    <div class="contact-item">
+                        <strong>Email:</strong>
+                        <a href="mailto:support@frcrcestuco.com">support@frcrcestuco.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Phone:</strong>
+                        <a href="tel:+919876543210">+91 98765 43210</a>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Hours:</strong>
+                        <span>Monday - Friday, 9:00 AM - 6:00 PM IST</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="email-footer">
-            <p>This email was sent to you because you signed up for an account.</p>
+            <p>You're getting this email because you signed up on the <a href="https://frcrcestuco.com/"> Fr. CRCE Students' Council website </a>.</p>
             <div class="footer-links">
                 <a href="#">Privacy Policy</a>
                 <a href="#">Terms of Service</a>
@@ -263,12 +351,5 @@ export async function sendEmail({ to, subject, url }: { to: string, subject: str
         </div>
     </div>
 </body>
-</html>`, // html body
-        });
-
-        console.log("Message sent: %s", info.messageId);
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    } catch (err) {
-        console.error("Error while sending mail", err);
-    }
+</html>`;
 }
