@@ -1,9 +1,5 @@
-import { Navbar } from "~/components/layout/nav-bar";
+import { redirect } from "@remix-run/react";
 
-export default function Index() {
-  return (
-    <div>
-      <Navbar />
-    </div>
-  );
+export function loader() {
+  return redirect("/index.html");
 }
