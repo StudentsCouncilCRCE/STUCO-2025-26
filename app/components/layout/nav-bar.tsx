@@ -1,89 +1,74 @@
-// app/components/navbar.tsx
 import { useState } from "react";
-import { Link, useNavigate } from "@remix-run/react";
-import { Button } from "@/components/ui/button";
-import { X, Menu } from "lucide-react";
-
-const links = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Services", href: "/services" },
-  { name: "Contact", href: "/contact" },
-];
+import { Link } from "@remix-run/react";
+import { Menu, X } from "lucide-react";
 
 export function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navigate = useNavigate();
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Services", href: "/services" },
+    { name: "Portfolio", href: "/portfolio" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   return (
-    <header className="w-full shadow-md bg-white dark:bg-gray-950 px-6 py-4 fixed z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-2xl font-bold text-gray-900 dark:text-white"
-        >
-          Pxtcode
-        </Link>
+    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-6xl mx-auto px-4">
+      <div className="navbar-glass rounded-2xl px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-2xl font-bold text-gradient hover:scale-105 transition-transform duration-200"
+          ></Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex space-x-6 items-center text-lg font-semibold">
-          {links.map((link) => (
-            <Link
-              key={link.name}
-              to={link.href}
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-2">
+            {navLinks.map((link) => (
+              <Link key={link.name} to={link.href} className="btn-ghost">
+                {link.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* CTA Button & Mobile Menu Button */}
+          <div className="flex items-center space-x-4">
+            <button className="btn-purple">Play</button>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden btn-ghost p-2"
+              aria-label="Toggle menu"
             >
-              {link.name}
-            </Link>
-          ))}
-          <Button
-            className="ml-4 px-6 py-2 font-bold text-lg"
-            onClick={() => navigate("/auth/signin")}
-          >
-            Get Started
-          </Button>
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-gray-700 dark:text-gray-300"
-          onClick={() => setMobileMenuOpen(true)}
-        >
-          <Menu size={28} />
-        </button>
-
-        {/* Mobile Sidebar */}
-        <div
-          className={`fixed top-0 right-0 h-full w-full md:w-2/3 md:max-w-xs max-w-xs bg-white dark:bg-gray-900 shadow-lg transform transition-transform duration-300 z-50 p-6 flex flex-col space-y-6 ${
-            mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <button
-            className="absolute top-4 right-4"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <X size={28} className="text-gray-700 dark:text-gray-300" />
-          </button>
-          {links.map((link) => (
-            <Link
-              key={link.name}
-              to={link.href}
-              className="px-2 text-lg font-semibold text-gray-800 dark:text-gray-200"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {link.name}
-            </Link>
-          ))}
-          <Button
-            className="text-base font-bold w-full"
-            onClick={() => navigate("/auth/signin")}
-          >
-            Get Started
-          </Button>
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-6 pt-6 border-t border-white/10 mobile-menu-enter">
+            <div className="flex flex-col space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="btn-ghost-mobile"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </header>
+    </nav>
   );
 }

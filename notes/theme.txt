@@ -1,0 +1,2 @@
+Theme Description (for AI generation):
+    Dark Mode UI Theme with a floating top-centered navbar. The navbar uses a deep grey background (#1e1e1e) with light text (#f0f0f0). On desktop, all nav links are visible; on mobile/tablet, a hamburger menu appears. A purple login button (#7e57c2) stands out on the dark background. The entire UI follows a modern, minimal, clean layout with rounded corners, soft shadows, and a cool, futuristic dark aesthetic. Fonts are sans-serif, and spacing is breathable.
