@@ -1,0 +1,35 @@
+{
+  "name": "Students' Council",
+  "description": "A modern web app built using Remix, Tailwind CSS, and ShadCN UI components.",
+  "framework": "Remix",
+  "libraries": [
+    "tailwindcss",
+    "shadcn/ui",
+    "lucide-react",
+    "clsx",
+    "react-hook-form"
+  ],
+  "author": {
+    "name": "Students' Council 25=26",
+    "url": "https://pxtcode.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/..."
+  },
+  "homepage": "https://frcrcestuco.com/",
+  "env": {
+    "runtime": "node",
+    "platform": "vercel | cloudflare | fly.io",
+    "features": ["SSR", "Edge Rendering", "API Routes"]
+  },
+  "ui": {
+    "theme": {
+      "mode": "light/dark",
+      "design": "clean, soft-shadowed, accessible",
+      "primaryColor": "#000000",
+      "fontFamily": "Inter, sans-serif"
+    },
+    "components": "Card, Button, Input, Alert, Label"
+  }
+}
