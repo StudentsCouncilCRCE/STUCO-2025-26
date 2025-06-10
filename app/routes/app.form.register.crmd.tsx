@@ -13,6 +13,7 @@ import {
   Trophy,
   ExternalLink,
 } from "lucide-react";
+import { ActionFunctionArgs, json } from "@remix-run/node";
 
 // Type definitions
 type FoodPreference = "Jain" | "Vegetarian" | "Non-Vegetarian";
@@ -129,7 +130,7 @@ export default function Participate(): JSX.Element {
     onDrop,
   }) => (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-white/90 flex items-center space-x-2">
+      <label className=" text-sm font-medium text-white/90 flex items-center space-x-2">
         <Icon className="h-4 w-4 text-indigo-400" />
         <span>{label}</span>
       </label>
@@ -457,7 +458,7 @@ export default function Participate(): JSX.Element {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Accommodation */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-white/90 flex items-center space-x-2">
+                <label className=" text-sm font-medium text-white/90 flex items-center space-x-2">
                   <Bed className="h-4 w-4 text-indigo-400" />
                   <span>Accommodation Necessary</span>
                 </label>
@@ -491,7 +492,7 @@ export default function Participate(): JSX.Element {
 
               {/* Food Preference */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-white/90 flex items-center space-x-2">
+                <label className=" text-sm font-medium text-white/90 flex items-center space-x-2">
                   <Utensils className="h-4 w-4 text-green-400" />
                   <span>Food Preference</span>
                 </label>
@@ -520,7 +521,7 @@ export default function Participate(): JSX.Element {
 
             {/* Past Debate Experience */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-white/90 flex items-center space-x-2">
+              <label className=" text-sm font-medium text-white/90 flex items-center space-x-2">
                 <Trophy className="h-4 w-4 text-yellow-400" />
                 <span>Past Oxford Style Debate Experience</span>
               </label>
@@ -550,4 +551,102 @@ export default function Participate(): JSX.Element {
       </div>
     </div>
   );
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  message?: string;
+  general?: string;
+  // Add other fields based on your registration form
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  password?: string;
+  confirmPassword?: string;
+  terms?: string;
+}
+
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+async function processFormSubmission(data: string): Promise<void> {
+  // Simulate API call or database operation
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Example: Save to database
+  // await db.contact.create({ data });
+
+  // Example: Send email
+  // await sendEmail({
+  //   to: "admin@example.com",
+  //   subject: "New Contact Form Submission",
+  //   text: `Name: ${data.name}\nEmail: ${data.email}\nMessage: ${data.message}`
+  // });
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+
+  // Extract form fields
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const message = formData.get("message") as string;
+
+  // Validation
+  const errors: FormErrors = {};
+
+  if (!name || name.trim().length < 2) {
+    errors.name = "Name must be at least 2 characters long";
+  }
+
+  if (!email || !isValidEmail(email)) {
+    errors.email = "Please enter a valid email address";
+  }
+
+  if (!message || message.trim().length < 10) {
+    errors.message = "Message must be at least 10 characters long";
+  }
+
+  // If there are validation errors, return them
+  if (Object.keys(errors).length > 0) {
+    return json(
+      {
+        success: false,
+        errors,
+        formData: { name, email, message },
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Process the form submission (e.g., save to database, send email, etc.)
+    await processFormSubmission("asd");
+
+    // Return success response
+    return json({
+      success: true,
+      message: "Form submitted successfully!",
+    });
+
+    // Alternative: Redirect to a success page
+    // return redirect("/success");
+  } catch (error) {
+    console.error("Form submission error:", error);
+
+    return json(
+      {
+        success: false,
+        errors: {
+          general:
+            "An error occurred while submitting the form. Please try again.",
+        },
+        formData: { name, email, message },
+      },
+      { status: 500 }
+    );
+  }
 }

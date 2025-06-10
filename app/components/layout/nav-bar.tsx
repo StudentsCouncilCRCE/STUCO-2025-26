@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { Menu, X, Play } from "lucide-react";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
+    { name: "Home", href: "/app/home" },
     { name: "Services", href: "/services" },
     { name: "Portfolio", href: "/portfolio" },
     { name: "Contact", href: "/contact" },
   ];
+
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-5xl mx-auto px-4">
@@ -43,7 +43,10 @@ export function Navbar() {
 
           {/* CTA Button & Mobile Menu Button */}
           <div className="flex items-center space-x-3">
-            <button className="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25">
+            <button
+              onClick={() => navigate("/app/play/home")}
+              className="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
+            >
               <Play className="h-4 w-4" />
               <span>Play</span>
             </button>
@@ -81,7 +84,10 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <button className="sm:hidden flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 ease-out mt-2 mx-4">
+              <button
+                onClick={() => navigate("/app/play/home")}
+                className="sm:hidden flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 ease-out mt-2 mx-4"
+              >
                 <Play className="h-4 w-4" />
                 <span>Play</span>
               </button>
