@@ -6,9 +6,8 @@ import { auth } from "~/lib/auth.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) {
-    throw redirect("/auth/signin"); // redirect to login if not authenticated
-  }
+  if (!session) throw redirect("/auth/signin"); // redirect to login if not authenticated
+
   return null;
 };
 
