@@ -1,9 +1,5 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 
-export default function AppHome() {
-  return (
-    <div>
-      <h1>Home Page</h1>
-    </div>
-  );
+export function loader({ request }: LoaderFunctionArgs) {
+  return redirect("/app/play/home");
 }
