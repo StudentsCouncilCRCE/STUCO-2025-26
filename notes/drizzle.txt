@@ -1,0 +1,9 @@
+npx drizzle-kit push
+
+npx drizzle-kit generate
+
+npx drizzle-kit migrate
+
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
