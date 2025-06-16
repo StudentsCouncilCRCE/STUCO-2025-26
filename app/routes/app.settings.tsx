@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { Button } from "~/components/ui/button";
@@ -23,6 +23,7 @@ import {
   EyeOff,
   Settings,
 } from "lucide-react";
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("intent") as string;
@@ -115,73 +116,87 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 }
+
 export default function SettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [lastActionData, setLastActionData] = useState<any>(null);
 
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
-  // Show toast notifications based on action results
-  if (actionData && "success" in actionData) {
-    toast.success(actionData.message);
-  } else if (actionData && "error" in actionData) {
-    toast.error(actionData.error);
-  }
+  // Show toast notifications based on action results - only when new data arrives
+  useEffect(() => {
+    if (actionData && actionData !== lastActionData) {
+      if ("success" in actionData) {
+        toast.success(actionData.message);
+      } else if ("error" in actionData) {
+        toast.error(actionData.error);
+      }
+      setLastActionData(actionData);
+    }
+  }, [actionData, lastActionData]);
 
   return (
     <div className="min-h-screen pt-20">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Settings className="text-[#7e57c2]" size={28} />
-            <h1 className="text-3xl font-bold text-[#f0f0f0]">
-              Account Settings
-            </h1>
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-[#7e57c2]/10 rounded-xl border border-[#7e57c2]/20">
+              <Settings className="text-[#7e57c2]" size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#f0f0f0] mb-1">
+                Account Settings
+              </h1>
+              <p className="text-slate-400 text-sm">
+                Manage your account preferences and security settings
+              </p>
+            </div>
           </div>
-          <p className="text-slate-400">
-            Manage your account preferences and security settings
-          </p>
         </div>
 
         {/* Settings Grid */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Profile Section */}
-          <Card className="bg-[#1e1e1e]/80 backdrop-blur-sm border-slate-700/30 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-[#f0f0f0] text-lg flex items-center gap-2">
-                <User className="text-[#7e57c2]" size={20} />
+          <Card className="bg-[#1e1e1e]/90 backdrop-blur-lg border-slate-700/40 shadow-2xl hover:shadow-[#7e57c2]/5 transition-all duration-300 hover:border-slate-600/50">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-[#f0f0f0] text-xl flex items-center gap-3">
+                <div className="p-2 bg-[#7e57c2]/10 rounded-lg">
+                  <User className="text-[#7e57c2]" size={20} />
+                </div>
                 Profile Information
               </CardTitle>
-              <CardDescription className="text-slate-400 text-sm">
+              <CardDescription className="text-slate-400 text-sm ml-11">
                 Update your display name and personal details
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Form method="post" className="space-y-4">
+            <CardContent className="pt-0">
+              <Form method="post" className="space-y-6">
                 <input type="hidden" name="intent" value="updateProfile" />
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label
                     htmlFor="name"
-                    className="text-[#f0f0f0] text-sm font-medium"
+                    className="text-[#f0f0f0] text-sm font-medium flex items-center gap-2"
                   >
                     Full Name
+                    <span className="text-xs text-slate-500">(Required)</span>
                   </Label>
                   <Input
                     id="name"
                     name="name"
                     placeholder="Enter your full name"
-                    className="bg-slate-800/50 border-slate-600/50 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 transition-colors"
+                    className="bg-slate-800/60 border-slate-600/60 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 transition-all duration-200 hover:border-slate-500/70 h-11"
                     required
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#7e57c2] hover:bg-[#6d48b8] text-white font-medium transition-colors flex items-center gap-2"
+                  className="bg-[#7e57c2] hover:bg-[#6d48b8] text-white font-medium transition-all duration-200 flex items-center gap-2 px-6 py-2.5 rounded-lg shadow-lg hover:shadow-[#7e57c2]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save size={16} />
                   {isSubmitting ? "Updating..." : "Update Profile"}
@@ -191,39 +206,44 @@ export default function SettingsPage() {
           </Card>
 
           {/* Email Section */}
-          <Card className="bg-[#1e1e1e]/80 backdrop-blur-sm border-slate-700/30 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-[#f0f0f0] text-lg flex items-center gap-2">
-                <Mail className="text-[#7e57c2]" size={20} />
+          <Card className="bg-[#1e1e1e]/90 backdrop-blur-lg border-slate-700/40 shadow-2xl hover:shadow-[#7e57c2]/5 transition-all duration-300 hover:border-slate-600/50">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-[#f0f0f0] text-xl flex items-center gap-3">
+                <div className="p-2 bg-[#7e57c2]/10 rounded-lg">
+                  <Mail className="text-[#7e57c2]" size={20} />
+                </div>
                 Email Address
               </CardTitle>
-              <CardDescription className="text-slate-400 text-sm">
+              <CardDescription className="text-slate-400 text-sm ml-11">
                 Change your email address - verification required
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Form method="post" className="space-y-4">
+            <CardContent className="pt-0">
+              <Form method="post" className="space-y-6">
                 <input type="hidden" name="intent" value="changeEmail" />
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label
                     htmlFor="email"
-                    className="text-[#f0f0f0] text-sm font-medium"
+                    className="text-[#f0f0f0] text-sm font-medium flex items-center gap-2"
                   >
                     New Email Address
+                    <span className="text-xs text-slate-500">
+                      (Verification required)
+                    </span>
                   </Label>
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     placeholder="Enter new email address"
-                    className="bg-slate-800/50 border-slate-600/50 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 transition-colors"
+                    className="bg-slate-800/60 border-slate-600/60 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 transition-all duration-200 hover:border-slate-500/70 h-11"
                     required
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#7e57c2] hover:bg-[#6d48b8] text-white font-medium transition-colors flex items-center gap-2"
+                  className="bg-[#7e57c2] hover:bg-[#6d48b8] text-white font-medium transition-all duration-200 flex items-center gap-2 px-6 py-2.5 rounded-lg shadow-lg hover:shadow-[#7e57c2]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Mail size={16} />
                   {isSubmitting ? "Sending..." : "Update Email"}
@@ -233,27 +253,30 @@ export default function SettingsPage() {
           </Card>
 
           {/* Password Section */}
-          <Card className="bg-[#1e1e1e]/80 backdrop-blur-sm border-slate-700/30 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-[#f0f0f0] text-lg flex items-center gap-2">
-                <Lock className="text-[#7e57c2]" size={20} />
+          <Card className="bg-[#1e1e1e]/90 backdrop-blur-lg border-slate-700/40 shadow-2xl hover:shadow-[#7e57c2]/5 transition-all duration-300 hover:border-slate-600/50">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-[#f0f0f0] text-xl flex items-center gap-3">
+                <div className="p-2 bg-[#7e57c2]/10 rounded-lg">
+                  <Lock className="text-[#7e57c2]" size={20} />
+                </div>
                 Password & Security
               </CardTitle>
-              <CardDescription className="text-slate-400 text-sm">
+              <CardDescription className="text-slate-400 text-sm ml-11">
                 Keep your account secure with a strong password
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Form method="post" className="space-y-4">
+            <CardContent className="pt-0">
+              <Form method="post" className="space-y-6">
                 <input type="hidden" name="intent" value="changePassword" />
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
                     <Label
                       htmlFor="currentPassword"
-                      className="text-[#f0f0f0] text-sm font-medium"
+                      className="text-[#f0f0f0] text-sm font-medium flex items-center gap-2"
                     >
                       Current Password
+                      <span className="text-xs text-slate-500">(Required)</span>
                     </Label>
                     <div className="relative">
                       <Input
@@ -261,7 +284,7 @@ export default function SettingsPage() {
                         name="currentPassword"
                         type={showCurrentPassword ? "text" : "password"}
                         placeholder="Current password"
-                        className="bg-slate-800/50 border-slate-600/50 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 pr-10 transition-colors"
+                        className="bg-slate-800/60 border-slate-600/60 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 pr-12 transition-all duration-200 hover:border-slate-500/70 h-11"
                         required
                       />
                       <button
@@ -269,7 +292,7 @@ export default function SettingsPage() {
                         onClick={() =>
                           setShowCurrentPassword(!showCurrentPassword)
                         }
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-[#f0f0f0] transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-[#f0f0f0] transition-colors p-1 rounded-md hover:bg-slate-700/50"
                       >
                         {showCurrentPassword ? (
                           <EyeOff size={16} />
@@ -280,12 +303,15 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label
                       htmlFor="newPassword"
-                      className="text-[#f0f0f0] text-sm font-medium"
+                      className="text-[#f0f0f0] text-sm font-medium flex items-center gap-2"
                     >
                       New Password
+                      <span className="text-xs text-slate-500">
+                        (Min 8 characters)
+                      </span>
                     </Label>
                     <div className="relative">
                       <Input
@@ -293,13 +319,13 @@ export default function SettingsPage() {
                         name="newPassword"
                         type={showNewPassword ? "text" : "password"}
                         placeholder="New password"
-                        className="bg-slate-800/50 border-slate-600/50 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 pr-10 transition-colors"
+                        className="bg-slate-800/60 border-slate-600/60 text-[#f0f0f0] focus:ring-2 focus:ring-[#7e57c2]/50 focus:border-[#7e57c2] placeholder:text-slate-500 pr-12 transition-all duration-200 hover:border-slate-500/70 h-11"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-[#f0f0f0] transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-[#f0f0f0] transition-colors p-1 rounded-md hover:bg-slate-700/50"
                       >
                         {showNewPassword ? (
                           <EyeOff size={16} />
@@ -311,56 +337,61 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-[#7e57c2] hover:bg-[#6d48b8] text-white font-medium transition-colors flex items-center gap-2"
-                >
-                  <Lock size={16} />
-                  {isSubmitting ? "Updating..." : "Change Password"}
-                </Button>
+                <div className="pt-2">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-[#7e57c2] hover:bg-[#6d48b8] text-white font-medium transition-all duration-200 flex items-center gap-2 px-6 py-2.5 rounded-lg shadow-lg hover:shadow-[#7e57c2]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Lock size={16} />
+                    {isSubmitting ? "Updating..." : "Change Password"}
+                  </Button>
+                </div>
               </Form>
             </CardContent>
           </Card>
 
           {/* Danger Zone */}
-          <Card className="bg-red-950/10 border-red-800/30 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-red-400 text-lg flex items-center gap-2">
-                <Trash2 className="text-red-400" size={20} />
+          <Card className="bg-red-950/20 backdrop-blur-lg border-red-800/40 shadow-2xl hover:shadow-red-500/5 transition-all duration-300 hover:border-red-700/50">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-red-400 text-xl flex items-center gap-3">
+                <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                  <Trash2 className="text-red-400" size={20} />
+                </div>
                 Danger Zone
               </CardTitle>
-              <CardDescription className="text-red-300/70 text-sm">
+              <CardDescription className="text-red-300/80 text-sm ml-11">
                 Irreversible actions that will permanently affect your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {!showDeleteConfirm ? (
                 <Button
                   onClick={() => setShowDeleteConfirm(true)}
                   variant="outline"
-                  className="border-red-600/50 text-red-400 hover:bg-red-600/10 hover:border-red-500 transition-colors"
+                  className="border-red-600/60 text-red-400 hover:bg-red-600/10 hover:border-red-500 transition-all duration-200 px-6 py-2.5 rounded-lg font-medium"
                 >
                   Delete Account
                 </Button>
               ) : (
-                <div className="space-y-4">
-                  <div className="p-4 bg-red-950/20 border border-red-800/20 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="text-red-400 text-lg">⚠️</div>
-                      <div>
-                        <p className="text-red-300 font-medium text-sm mb-1">
+                <div className="space-y-6">
+                  <div className="p-5 bg-red-950/30 border border-red-800/30 rounded-xl">
+                    <div className="flex items-start gap-4">
+                      <div className="text-red-400 text-2xl mt-0.5">⚠️</div>
+                      <div className="flex-1">
+                        <p className="text-red-300 font-semibold text-base mb-2">
                           This action cannot be undone
                         </p>
-                        <p className="text-red-200/70 text-sm">
+                        <p className="text-red-200/80 text-sm leading-relaxed">
                           All your data will be permanently deleted from our
-                          servers.
+                          servers. This includes your profile, settings, and any
+                          associated content.
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <Form method="post" className="flex-1">
                       <input
                         type="hidden"
@@ -370,7 +401,7 @@ export default function SettingsPage() {
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium transition-colors flex items-center justify-center gap-2"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg shadow-lg hover:shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={16} />
                         {isSubmitting ? "Deleting..." : "Confirm Delete"}
@@ -380,7 +411,7 @@ export default function SettingsPage() {
                     <Button
                       onClick={() => setShowDeleteConfirm(false)}
                       variant="outline"
-                      className="flex-1 border-slate-600/50 text-[#f0f0f0] hover:bg-slate-700/50 transition-colors"
+                      className="flex-1 border-slate-600/60 text-[#f0f0f0] hover:bg-slate-700/50 transition-all duration-200 px-6 py-2.5 rounded-lg font-medium"
                     >
                       Cancel
                     </Button>
