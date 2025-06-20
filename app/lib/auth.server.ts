@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
-import { getChangeEmailVerificationMail, getVerificationMail, sendEmail } from "./mailer.server";
+import { getVerificationMail, getChangeEmailVerificationMail } from "~/helpers/mailer";
+import { sendEmail } from "./mailer.server";
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { authSchema } from "~/db/schema/auth-schema";
 

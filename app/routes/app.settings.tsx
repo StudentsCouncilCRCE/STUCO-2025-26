@@ -90,14 +90,25 @@ export async function action({ request }: ActionFunctionArgs) {
       }
 
       case "deleteAccount": {
-        // Add request parameter - this was missing!
+        const confirmPassword = formData.get("confirmPassword") as string;
+
+        if (!confirmPassword) {
+          return json(
+            { error: "Password confirmation is required" },
+            { status: 400 }
+          );
+        }
+
+        // Verify password before deletion
         const result = await auth.api.deleteUser({
-          body: {},
-          headers: request.headers, // Add this line
+          body: { password: confirmPassword },
+          headers: request.headers,
         });
 
         if (!result) {
-          throw new Error("Failed to delete account");
+          throw new Error(
+            "Failed to delete account. Please check your password."
+          );
         }
 
         return json({ success: true, message: "Account deleted successfully" });
@@ -120,6 +131,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function SettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [lastActionData, setLastActionData] = useState<any>(null);
 
@@ -391,31 +403,66 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Form method="post" className="flex-1">
-                      <input
-                        type="hidden"
-                        name="intent"
-                        value="deleteAccount"
-                      />
+                  <Form method="post" className="space-y-6">
+                    <input type="hidden" name="intent" value="deleteAccount" />
+
+                    <div className="space-y-3">
+                      <Label
+                        htmlFor="confirmPassword"
+                        className="text-red-300 text-sm font-medium flex items-center gap-2"
+                      >
+                        Confirm Password
+                        <span className="text-xs text-red-400">
+                          (Required for deletion)
+                        </span>
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Enter your password to confirm deletion"
+                          className="bg-red-950/30 border-red-800/60 text-red-200 focus:ring-2 focus:ring-red-500/50 focus:border-red-500 placeholder:text-red-400/60 pr-12 transition-all duration-200 hover:border-red-700/70 h-11"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400 hover:text-red-200 transition-colors p-1 rounded-md hover:bg-red-800/30"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg shadow-lg hover:shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg shadow-lg hover:shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={16} />
-                        {isSubmitting ? "Deleting..." : "Confirm Delete"}
+                        {isSubmitting
+                          ? "Deleting..."
+                          : "Confirm Delete Account"}
                       </Button>
-                    </Form>
 
-                    <Button
-                      onClick={() => setShowDeleteConfirm(false)}
-                      variant="outline"
-                      className="flex-1 border-slate-600/60 text-[#f0f0f0] hover:bg-slate-700/50 transition-all duration-200 px-6 py-2.5 rounded-lg font-medium"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
+                      <Button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(false)}
+                        variant="outline"
+                        className="flex-1 border-slate-600/60 text-[#f0f0f0] hover:bg-slate-700/50 transition-all duration-200 px-6 py-2.5 rounded-lg font-medium"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </Form>
                 </div>
               )}
             </CardContent>
