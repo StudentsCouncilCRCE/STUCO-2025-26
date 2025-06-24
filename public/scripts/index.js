@@ -1,1 +1,23 @@
-function toggleMenu(){document.getElementById("nav-links").classList.toggle("show")}function toggleFollow(e){"Follow +"===e.textContent.trim()?(e.textContent="Following ✓",e.style.background="#00C851",e.style.color="white"):(e.textContent="Follow +",e.style.background="#ffffff",e.style.color="#000000")}document.addEventListener("mousemove",(e=>{const t=document.querySelectorAll(".profile-card"),o=e.clientX/window.innerWidth,n=e.clientY/window.innerHeight;t.forEach(((e,t)=>{const l=t%2==0?1:-1,r=5*(n-.5)*l,c=5*(o-.5)*l;e.style.transform=`perspective(1000px) rotateX(${r}deg) rotateY(${c}deg)`}))})),addEventListener("mouseleave",(()=>{document.querySelectorAll(".profile-card").forEach((e=>{e.style.transform="perspective(1000px) rotateX(0deg) rotateY(0deg)"}))}));
+function toggleMenu() {
+  const nav = document.getElementById("nav-links");
+  nav.classList.toggle("show");
+}
+
+// Add subtle parallax effect on mouse move
+document.addEventListener("mousemove", (e) => {
+  const cards = document.querySelectorAll(".profile-card");
+  const x = e.clientX / window.innerWidth;
+  const y = e.clientY / window.innerHeight;
+  cards.forEach((card, index) => {
+    const multiplier = index % 2 === 0 ? 1 : -1;
+    const rotateX = (y - 0.5) * 5 * multiplier;
+    const rotateY = (x - 0.5) * 5 * multiplier;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+}); // Reset transform on mouse leave document.
+addEventListener("mouseleave", () => {
+  const cards = document.querySelectorAll(".profile-card");
+  cards.forEach((card) => {
+    card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
+  });
+});
