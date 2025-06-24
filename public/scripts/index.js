@@ -2,17 +2,7 @@ function toggleMenu() {
   const nav = document.getElementById("nav-links");
   nav.classList.toggle("show");
 }
-function toggleFollow(button) {
-  if (button.textContent.trim() === "Follow +") {
-    button.textContent = "Following ✓";
-    button.style.background = "#00C851";
-    button.style.color = "white";
-  } else {
-    button.textContent = "Follow +";
-    button.style.background = "#ffffff";
-    button.style.color = "#000000";
-  }
-}
+
 // Add subtle parallax effect on mouse move
 document.addEventListener("mousemove", (e) => {
   const cards = document.querySelectorAll(".profile-card");
