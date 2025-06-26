@@ -1,14 +1,14 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
+import { getVerificationMail, getChangeEmailVerificationMail } from "~/helpers/mailer";
 import { sendEmail } from "./mailer.server";
-import { schema } from "~/db/schema";
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { authSchema } from "~/db/schema/auth-schema";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
-        provider: "pg",
-        schema: schema
+        provider: "mysql", schema: authSchema
     }),
     emailAndPassword: {
         enabled: true,
@@ -16,13 +16,31 @@ export const auth = betterAuth({
     },
     emailVerification: {
         sendOnSignUp: true,
-        sendVerificationEmail: async ({ user, url, token }, request) => {
+        sendVerificationEmail: async ({ user, url, token }) => {
             await sendEmail({
                 to: user.email,
                 subject: 'Verify your email address',
-                url: url,
+                html: getVerificationMail(url),
             })
         }
+    },
+    user: {
+        changeEmail: {
+            enabled: true,
+            sendChangeEmailVerification: async ({ user, newEmail, url, token }) => {
+                await sendEmail({
+                    to: newEmail,
+                    subject: 'Approve email change',
+                    html: getChangeEmailVerificationMail(url)
+                })
+            }
+        },
+        deleteUser: {
+            enabled: true,
+            beforeDelete: async (user) => {
+                // Perform any cleanup or additional checks here
+            },
+        },
     },
     advanced: {
         cookiePrefix: "stuco",

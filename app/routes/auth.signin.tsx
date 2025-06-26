@@ -9,7 +9,15 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { authClient } from "~/lib/auth.client";
-import { useNavigate } from "@remix-run/react";
+import { redirect, useNavigate } from "@remix-run/react";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { auth } from "~/lib/auth.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const session = await auth.api.getSession(request);
+  if (session) return redirect("/app/home");
+  return null;
+}
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -76,7 +84,7 @@ export default function SignInPage() {
           },
           onSuccess: (ctx: any) => {
             setIsLoading(false);
-            navigate("/app/home");
+            navigate("/app/play/home");
           },
           onError: (ctx: any) => {
             setIsLoading(false);

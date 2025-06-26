@@ -6,9 +6,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navLinks = [
     { name: "Home", href: "/app/home" },
-    { name: "Services", href: "/services" },
-    { name: "Portfolio", href: "/portfolio" },
-    { name: "Contact", href: "/contact" },
+    { name: "Settings ", href: "/app/settings" },
   ];
 
   const navigate = useNavigate();
