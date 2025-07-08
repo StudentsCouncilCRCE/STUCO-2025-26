@@ -29,7 +29,6 @@ nav a {
 body {
   font-family: sans-serif;
   background-color: #121314;
-  padding-top: 70px;
   width: 99vw;
 }
 header {
@@ -57,8 +56,15 @@ nav {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 .brand {
-  font-weight: 700;
-  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.brand-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
 }
 nav {
   gap: 15px;
