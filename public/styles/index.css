@@ -95,9 +95,67 @@ nav a:hover {
 
 .hamburger {
   display: none;
-  font-size: 1.8em;
+  width: 36px;
+  height: 36px;
+  position: relative;
+  border: none;
+  background: none;
   cursor: pointer;
-  color: #fff;
+  z-index: 1100;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger-box {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  position: relative;
+}
+
+.hamburger-inner {
+  display: block;
+  top: 50%;
+  margin-top: -2px;
+  width: 28px;
+  height: 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  position: absolute;
+  left: 4px;
+  transition: background-color 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger-inner::before,
+.hamburger-inner::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  position: absolute;
+  left: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger-inner::before {
+  top: -10px;
+}
+
+.hamburger-inner::after {
+  bottom: -10px;
+}
+
+.hamburger.active .hamburger-inner {
+  background-color: transparent;
+}
+
+.hamburger.active .hamburger-inner::before {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.hamburger.active .hamburger-inner::after {
+  transform: translateY(-10px) rotate(-45deg);
 }
 
 #nav-login {
@@ -120,10 +178,19 @@ nav a:hover {
     padding: 10px;
     border-radius: 8px;
     z-index: 100;
+    /* Animation for sliding in from bottom */
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
   }
 
   .navbar.nav-open #nav-links {
     display: flex !important;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    animation: navSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .hamburger {
@@ -1154,5 +1221,17 @@ button:hover .star-6 {
 
   .social-icons {
     justify-content: center;
+  }
+}
+
+@keyframes navSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
