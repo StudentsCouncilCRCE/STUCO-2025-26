@@ -1,8 +1,3 @@
-function toggleMenu() {
-  const nav = document.getElementById("nav-links");
-  nav.classList.toggle("show");
-}
-
 // Add subtle parallax effect on mouse move
 document.addEventListener("mousemove", (e) => {
   const cards = document.querySelectorAll(".profile-card");
