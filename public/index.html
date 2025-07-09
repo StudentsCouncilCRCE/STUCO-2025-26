@@ -455,6 +455,8 @@
         .hero-content > *:nth-child(1) { animation-delay: 0.2s; }
         .hero-content > *:nth-child(2) { animation-delay: 0.4s; }
         .hero-content > *:nth-child(3) { animation-delay: 0.6s; }
+
+        
     </style>
   </head>
   <body>
@@ -624,7 +626,7 @@
             </div>
           </button>
         </nav>
-        <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
+        <div class="hamburger">&#9776;</div>
       </div>
     </header>
     <main>
@@ -639,7 +641,7 @@
         <!-- 3D Logo -->
         <div class="logo-intro-overlay" id="logoIntroOverlay">
           <video id="logoIntroVideo" autoplay muted>
-            <source src="public\images\Videos\Recording 2025-07-07 220714.mp4" type="video/mp4">
+            <source src="public/images/Videos/Recording 2025-07-07 220714.mp4" type="video/mp4">
             <!-- Add other video formats if needed -->
           </video>
         </div>
@@ -1998,6 +2000,27 @@
             const particleContainer = document.getElementById('particles');
             particleContainer.innerHTML = '';
             createParticles();
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+          const hamburger = document.querySelector(".hamburger");
+          const navbar = document.querySelector(".navbar");
+          const navLinks = document.querySelectorAll("#nav-links a");
+
+          // Toggle navigation menu on hamburger click
+          if (hamburger && navbar) {
+            hamburger.addEventListener("click", () => {
+              navbar.classList.toggle("nav-open");
+            });
+          }
+
+          // Close navigation menu when a link is clicked (mobile UX)
+          if (navbar) {
+            navLinks.forEach((link) => {
+              link.addEventListener("click", () => {
+                navbar.classList.remove("nav-open");
+              });
+            });
+          }
         });
     </script>
   </body>
