@@ -720,24 +720,6 @@
           <div class="wave"></div>
         </div>
 
-        <!-- 3D Logo -->
-        <div class="logo-intro-overlay" id="logoIntroOverlay">
-          <video
-            id="logoIntroVideo"
-            autoplay
-            muted
-            playsinline
-            webkit-playsinline
-          >
-            <source
-              src="/images/Videos/Recording%202025-07-07%20220714.mp4"
-              type="video/mp4"
-            />
-            <!-- Add other video formats if needed -->
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
         <div class="logo-3d" id="logo3d" style="opacity: 0">
           <img src="/favicon.ico" alt="Council Official Logo" />
         </div>
@@ -2006,29 +1988,7 @@
     </footer>
     <script src="/scripts/index.js"></script>
     <script>
-      //Logo animation
-      document.addEventListener("DOMContentLoaded", function () {
-        const logoIntroVideo = document.getElementById("logoIntroVideo");
-        const logoIntroOverlay = document.getElementById("logoIntroOverlay");
-        const logo3d = document.getElementById("logo3d");
-
-        logoIntroVideo.addEventListener("ended", function () {
-          logoIntroOverlay.classList.add("fade-out");
-          setTimeout(() => {
-            logoIntroOverlay.style.display = "none";
-            logo3d.classList.add("show");
-          }, 500);
-        });
-
-        // Fallback in case video fails to load
-        logoIntroVideo.addEventListener("error", function () {
-          logoIntroOverlay.classList.add("fade-out");
-          setTimeout(() => {
-            logoIntroOverlay.style.display = "none";
-            logo3d.classList.add("show");
-          }, 500);
-        });
-      });
+    
 
       // Particle System
       function createParticles() {
