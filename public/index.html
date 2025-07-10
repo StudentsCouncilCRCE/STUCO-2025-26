@@ -114,6 +114,8 @@
     }
 
     .hero-title {
+      top: 75%;
+      font-family: 'Sterion-BLLld';
       font-size: clamp(2.5rem, 8vw, 6rem);
       font-weight: 900;
       margin-bottom: 1rem;
@@ -136,6 +138,7 @@
     }
 
     .year-badge {
+      font-family: 'Sterion-BLLld';
       font-size: clamp(1rem, 3vw, 1.5rem);
       font-weight: 300;
     }
@@ -177,7 +180,7 @@
 
     .logo-3d {
       position: absolute;
-      top: 50%;
+      top: 25%;
       left: 50%;
       transform: translate(-50%, -50%);
       width: 150px;
@@ -279,7 +282,7 @@
     }
 
     .shape-cultural {
-      top: 25%;
+      top: 20%;
       right: 20%;
       background: rgba(233, 30, 99, 0.1);
       border-color: #e91e63;
@@ -289,7 +292,7 @@
 
     .shape-marketing {
       bottom: 30%;
-      left: 10%;
+      left: 30%;
       background: rgba(255, 152, 0, 0.1);
       border-color: #ff9800;
       color: #ff9800;
@@ -311,6 +314,15 @@
       background: rgba(255, 87, 34, 0.1);
       border-color: #ff5722;
       color: #ff5722;
+      animation-delay: -8s;
+    }
+
+    .shape-film {
+      top: 80%;
+      left: 20%;
+      background: rgba(255, 87, 34, 0.1);
+      border-color: cyan;
+      color: cyan;
       animation-delay: -8s;
     }
 
@@ -655,6 +667,7 @@
         <div class="geometric-shape shape-marketing" data-dept="marketing">MARKETING</div>
         <div class="geometric-shape shape-finance" data-dept="finance">FINANCE</div>
         <div class="geometric-shape shape-sports" data-dept="sports">SPORTS</div>
+        <div class="geometric-shape shape-film" data-dept="sports">FILM</div>
       </div>
 
       <!-- Particle System -->
@@ -664,7 +677,7 @@
       <div class="hero-content">
         <h1 class="hero-title">
           Students' Council
-          <sup class="year-badge">²⁵⁻²⁶</sup>
+          <!-- <sup class="year-badge">²⁵⁻²⁶</sup> -->
         </h1>
         <p class="hero-subtitle">Empowering Student Voice • Building Tomorrow's Leaders</p>
         <div class="cta-container">

@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Sterion-BLLld';
+  src: url('/Fonts/sterion-font/SterionItalic-R99PA.ttf') format('truetype');
+}
+
 @keyframes fadeInUp {
   0% {
     opacity: 0;
