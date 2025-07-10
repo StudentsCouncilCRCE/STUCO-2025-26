@@ -1,3 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Fredoka:wght@300..700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap');
+
+.chewy-regular {
+  font-family: "Chewy", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.tangerine-regular {
+  font-family: "Tangerine", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.tangerine-bold {
+  font-family: "Tangerine", cursive;
+  font-weight: 700;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'Sterion-BLLld';
+  src: url('/Fonts/sterion-font/SterionItalic-R99PA.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Struic';
+  src: url('/Fonts/struic-font/Struic-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Chewy';
+  src: url('/Fonts/Chewy/Chewy-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @keyframes fadeInUp {
   0% {
     opacity: 0;
@@ -34,7 +76,7 @@ nav a {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: 'Struic', 'Chewy', cursive, sans-serif;
   background-color: #121314;
   width: 99vw;
 }
@@ -204,6 +246,10 @@ nav a:hover {
   align-items: center;
   width: 100%;
   height: calc(100vh - 100px);
+}
+
+.hero-title {
+  font-family: 'Sterion-BLLld', 'Kirginia', sans-serif;
 }
 
 .hero-text {
@@ -410,7 +456,7 @@ button:hover .star-6 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 30px;
-  background: linear-gradient(135deg, #f0f0f0 0, #7e57c2 100%);
+  background: white/* linear-gradient(135deg, #f0f0f0 0, #7e57c2 100%) */;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
