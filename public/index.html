@@ -49,12 +49,14 @@
       position: absolute;
       width: 200%;
       height: 200%;
-      background: linear-gradient(45deg,
-          rgba(126, 87, 194, 0.08) 0%,
-          rgba(233, 30, 99, 0.08) 25%,
-          rgba(0, 188, 212, 0.08) 50%,
-          rgba(255, 152, 0, 0.08) 75%,
-          rgba(126, 87, 194, 0.08) 100%);
+      background: radial-gradient(ellipse at bottom, #0d0d1a 0%, #000000 100%),
+            linear-gradient(45deg,
+              rgba(126, 87, 194, 0.04) 0%,
+              rgba(233, 30, 99, 0.04) 25%,
+              rgba(0, 188, 212, 0.04) 50%,
+              rgba(255, 152, 0, 0.04) 75%,
+              rgba(126, 87, 194, 0.04) 100%);
+      background-color: #000000;
       background-size: 400% 400%;
       border-radius: 50%;
       filter: blur(80px);
@@ -924,12 +926,12 @@
           <!-- <div class="decorative-element">
             <div class="decorative-pattern"></div>
           </div> -->
-          <div class="silhouettes">
+          <!-- <div class="silhouettes">
             <div class="silhouette"></div>
             <div class="silhouette"></div>
             <div class="silhouette"></div>
             <div class="silhouette"></div>
-          </div>
+          </div> -->
         </div>
         <div class="card-content">
           <div class="date-time">
@@ -1651,10 +1653,9 @@
       <div class="footer-section social">
         <h3>Connect with Us</h3>
         <div class="social-icons">
-          <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a
-            href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a><a
-            href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a
-            href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="mailto:stucofrcrce@gmail.com" target="_blank" aria-label="Mail"><i class="fa fa-envelope"></i></a><a
+            href="https://www.instagram.com/frcrce_official" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a
+            href="https://www.linkedin.com/in/students-council-crce-b9a005316" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
         </div>
       </div>
     </div>
@@ -1667,7 +1668,344 @@
   </footer>
   <script src="/scripts/index.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    // Enhanced device detection and performance optimization
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
+    const isLowPerformance = isMobile || window.devicePixelRatio < 2;
+    const hasReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Global state management
+    let animationFrameId;
+    let lastInteractionTime = 0;
+    let isInitialized = false;
+    let touchTimeout = null;
+    let currentTouchHandler = null;
+    const INTERACTION_THROTTLE = isMobile ? 32 : 16;
+    const MAX_FPS = 60;
+    const FRAME_DURATION = 1000 / MAX_FPS;
+    let lastFrameTime = 0;
+
+    // FIXED: Proper cleanup function to prevent memory leaks
+    function cleanup() {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      
+      // Clear touch timeouts
+      if (touchTimeout) {
+        clearTimeout(touchTimeout);
+        touchTimeout = null;
+      }
+      
+      // Clear existing particles to prevent memory bloat
+      const particleContainer = document.getElementById("particles");
+      if (particleContainer) {
+        particleContainer.innerHTML = '';
+      }
+      
+      // Reset shapes to default state and clear animations
+      const shapes = document.querySelectorAll(".geometric-shape");
+      shapes.forEach((shape) => {
+        shape.style.transform = "translate3d(0, 0, 0) scale(1)";
+        shape.style.transition = "";
+        shape.style.animationPlayState = "running";
+        shape.classList.remove("float-animation");
+        // Re-add float animation class
+        requestAnimationFrame(() => {
+          shape.classList.add("float-animation");
+        });
+      });
+    }
+
+    // FIXED: Optimized Particle System with proper overflow handling
+    function createParticles() {
+      const particleContainer = document.getElementById("particles");
+      if (!particleContainer) return;
+
+      // Respect user's motion preferences
+      if (hasReducedMotion) return;
+
+      // Conservative particle counts
+      let particleCount;
+      if (isMobile && window.innerWidth < 480) {
+        particleCount = 6;  // current for very small screens
+      } else if (isMobile && window.innerWidth < 768) {
+        particleCount = 10;  // NEW: mid-range mobiles like iPhones, Pixels
+      } else if (isMobile) {
+        particleCount = 14;  // big-screen mobiles
+      } else if (isTablet) {
+        particleCount = 20;
+      } else {
+        particleCount = window.innerWidth > 1400 ? 30 : 20;
+      }
+
+
+      // Clear existing particles before creating new ones
+      particleContainer.innerHTML = '';
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        
+        // FIXED: Prevent particle overflow by accounting for particle width
+        const particleOffset = 10; // Assuming 20px particle width
+        const leftPosition = Math.random() * (100 - (particleOffset * 2 / window.innerWidth * 100));
+        particle.style.left = `calc(${leftPosition}% + ${particleOffset}px)`;
+        
+        particle.style.animationDelay = Math.random() * 15 + "s";
+        particle.style.animationDuration = Math.random() * 10 + 10 + "s";
+
+        // Enhanced hardware acceleration
+        particle.style.transform = "translate3d(0, 0, 0)";
+        particle.style.backfaceVisibility = "hidden";
+        particle.style.willChange = "transform";
+
+        particleContainer.appendChild(particle);
+      }
+    }
+
+    // FPS-throttled animation frame
+    function throttledAnimationFrame(callback) {
+      const now = Date.now();
+      if (now - lastFrameTime >= FRAME_DURATION) {
+        lastFrameTime = now;
+        return requestAnimationFrame(callback);
+      }
+      return setTimeout(() => throttledAnimationFrame(callback), FRAME_DURATION - (now - lastFrameTime));
+    }
+
+    // Optimized interaction system with FPS throttling
+    function handleInteraction(clientX, clientY) {
+      const currentTime = Date.now();
+      if (currentTime - lastInteractionTime < INTERACTION_THROTTLE) return;
+      lastInteractionTime = currentTime;
+
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+
+      animationFrameId = throttledAnimationFrame(() => {
+        const shapes = document.querySelectorAll(".geometric-shape");
+        const interactionX = clientX;
+        const interactionY = clientY;
+
+        shapes.forEach((shape) => {
+          const rect = shape.getBoundingClientRect();
+          const shapeCenterX = rect.left + rect.width / 2;
+          const shapeCenterY = rect.top + rect.height / 2;
+
+          const deltaX = interactionX - shapeCenterX;
+          const deltaY = interactionY - shapeCenterY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+          const maxDistance = isMobile ? 100 : 180;
+
+          if (distance < maxDistance) {
+            const angle = Math.atan2(deltaY, deltaX);
+            const moveMultiplier = isMobile ? 0.03 : 0.06;
+            const moveX = Math.cos(angle) * (maxDistance - distance) * moveMultiplier;
+            const moveY = Math.sin(angle) * (maxDistance - distance) * moveMultiplier;
+
+            // Add subtle 3D perspective
+            shape.style.transform = `perspective(600px) translate3d(${moveX}px, ${moveY}px, 0) scale(1.05)`;
+          } else {
+            shape.style.transform = "perspective(600px) translate3d(0, 0, 0) scale(1)";
+          }
+        });
+      });
+    }
+
+    // Desktop mouse interaction
+    function initializeDesktopInteraction() {
+      if (!isMobile && !isTablet) {
+        document.addEventListener("mousemove", (e) => {
+          handleInteraction(e.clientX, e.clientY);
+        });
+      }
+    }
+
+    // FIXED: Proper mobile touch handling with conflict resolution
+    function initializeMobileInteraction() {
+      if (isMobile || isTablet) {
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let isScrolling = false;
+        let isInteracting = false;
+
+        function clearTouchInteraction() {
+          if (touchTimeout) {
+            clearTimeout(touchTimeout);
+            touchTimeout = null;
+          }
+          if (currentTouchHandler) {
+            document.removeEventListener("touchend", currentTouchHandler);
+            currentTouchHandler = null;
+          }
+          isInteracting = false;
+          
+          // Reset shapes
+          const shapes = document.querySelectorAll(".geometric-shape");
+          shapes.forEach((shape) => {
+            shape.style.transform = "perspective(600px) translate3d(0, 0, 0) scale(1)";
+          });
+        }
+
+        document.addEventListener("touchstart", (e) => {
+          const touch = e.touches[0];
+          touchStartY = touch.clientY;
+          touchStartX = touch.clientX;
+          isScrolling = false;
+          isInteracting = true;
+          
+          // Clear any existing touch interactions
+          clearTouchInteraction();
+          
+          if (!isScrolling) {
+            handleInteraction(touch.clientX, touch.clientY);
+          }
+        }, { passive: true });
+
+        document.addEventListener("touchmove", (e) => {
+          const touch = e.touches[0];
+          const deltaY = Math.abs(touch.clientY - touchStartY);
+          const deltaX = Math.abs(touch.clientX - touchStartX);
+          
+          // Detect vertical scrolling
+          if (deltaY > 10 && deltaY > deltaX) {
+            isScrolling = true;
+            clearTouchInteraction();
+            return;
+          }
+          
+          if (!isScrolling && isInteracting) {
+            handleInteraction(touch.clientX, touch.clientY);
+          }
+
+          // FIXED: Prevent multiple timeout conflicts
+          if (touchTimeout) {
+            clearTimeout(touchTimeout);
+          }
+
+          touchTimeout = setTimeout(() => {
+            clearTouchInteraction();
+          }, 150);
+        }, { passive: true });
+
+        document.addEventListener("touchend", () => {
+          setTimeout(() => {
+            clearTouchInteraction();
+          }, 100);
+        }, { passive: true });
+      }
+    }
+
+    // FIXED: Use CSS classes instead of inline styles for reliable animations
+    function initializeShapes() {
+      const shapes = document.querySelectorAll(".geometric-shape");
+      
+      shapes.forEach((shape) => {
+        // Enhanced hardware acceleration with 3D perspective
+        shape.style.transform = "perspective(600px) translate3d(0, 0, 0)";
+        shape.style.backfaceVisibility = "hidden";
+        shape.style.willChange = "transform";
+        
+        // Add initial float animation class
+        shape.classList.add("float-animation");
+        
+        if (isMobile) {
+          shape.style.touchAction = "manipulation";
+        }
+
+        const handleShapeInteraction = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // FIXED: Use CSS class toggling for reliable animation restart
+          shape.classList.remove("float-animation");
+          shape.style.transition = "transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+
+          const scale = isMobile ? 1.2 : 1.4;
+          shape.style.transform = `perspective(600px) scale(${scale}) rotate3d(0, 1, 0, 180deg) translate3d(0, 0, 0)`;
+
+          setTimeout(() => {
+            shape.style.transform = "perspective(600px) scale(1) rotate3d(0, 1, 0, 0deg) translate3d(0, 0, 0)";
+            shape.style.transition = "";
+            // FIXED: Reliable animation restart with requestAnimationFrame
+            requestAnimationFrame(() => {
+              shape.classList.add("float-animation");
+            });
+          }, 400);
+        };
+
+        shape.addEventListener("click", handleShapeInteraction);
+
+        if (isMobile || isTablet) {
+          shape.addEventListener("touchstart", (e) => {
+            const touch = e.touches[0];
+            const startX = touch.clientX;
+            const startY = touch.clientY;
+            
+            const handleTouchEnd = (endEvent) => {
+              const endTouch = endEvent.changedTouches[0];
+              const deltaX = Math.abs(endTouch.clientX - startX);
+              const deltaY = Math.abs(endTouch.clientY - startY);
+              
+              if (deltaX < 10 && deltaY < 10) {
+                handleShapeInteraction(e);
+              }
+              
+              shape.removeEventListener("touchend", handleTouchEnd);
+            };
+            
+            shape.addEventListener("touchend", handleTouchEnd, { passive: false });
+          }, { passive: true });
+        }
+      });
+    }
+
+    // Navigation menu handling
+    function initializeNavigation() {
+      const hamburger = document.querySelector(".hamburger");
+      const navbar = document.querySelector(".navbar");
+      const navLinks = document.querySelectorAll("#nav-links a");
+
+      if (hamburger && navbar) {
+        const toggleNav = () => {
+          navbar.classList.toggle("nav-open");
+          hamburger.classList.toggle("active");
+        };
+
+        hamburger.addEventListener("click", toggleNav);
+        
+        hamburger.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleNav();
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!navbar.contains(e.target) && !hamburger.contains(e.target)) {
+            navbar.classList.remove("nav-open");
+            hamburger.classList.remove("active");
+          }
+        });
+      }
+
+      if (navbar && hamburger) {
+        navLinks.forEach((link) => {
+          link.addEventListener("click", () => {
+            navbar.classList.remove("nav-open");
+            hamburger.classList.remove("active");
+          });
+        });
+      }
+    }
+
+    // Logo intro handling
+    function initializeLogoIntro() {
       const logoIntroVideo = document.getElementById("logoIntroVideo");
       const logoIntroOverlay = document.getElementById("logoIntroOverlay");
       const logo3d = document.getElementById("logo3d");
@@ -1684,240 +2022,129 @@
 
       logoIntroVideo.addEventListener("ended", handleVideoEndOrError);
       logoIntroVideo.addEventListener("error", handleVideoEndOrError);
-    });
-
-    // Device detection and performance optimization
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isLowPerformance = isMobile || window.devicePixelRatio < 2;
-
-    // Optimized Particle System
-    function createParticles() {
-      const particleContainer = document.getElementById("particles");
-      if (!particleContainer) return;
-
-      // Reduce particle count on mobile for better performance
-      const particleCount = isMobile ? 15 : window.innerWidth > 768 ? 50 : 25;
-
-      // Clear existing particles
-      particleContainer.innerHTML = '';
-
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement("div");
-        particle.className = "particle";
-        particle.style.left = Math.random() * 100 + "%";
-        particle.style.animationDelay = Math.random() * 15 + "s";
-        particle.style.animationDuration = Math.random() * 10 + 10 + "s";
-
-        // Add hardware acceleration for better mobile performance
-        particle.style.transform = "translateZ(0)";
-        particle.style.backfaceVisibility = "hidden";
-        particle.style.perspective = "1000px";
-
-        particleContainer.appendChild(particle);
-      }
     }
 
-    // Optimized mouse/touch interaction system
-    let animationFrameId;
-    let lastInteractionTime = 0;
-    const INTERACTION_THROTTLE = 16; // ~60fps
-
-    function handleInteraction(clientX, clientY) {
-      const currentTime = Date.now();
-      if (currentTime - lastInteractionTime < INTERACTION_THROTTLE) return;
-      lastInteractionTime = currentTime;
-
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-
-      animationFrameId = requestAnimationFrame(() => {
-        const shapes = document.querySelectorAll(".geometric-shape");
-        const interactionX = clientX;
-        const interactionY = clientY;
-
-        shapes.forEach((shape) => {
-          const rect = shape.getBoundingClientRect();
-          const shapeCenterX = rect.left + rect.width / 2;
-          const shapeCenterY = rect.top + rect.height / 2;
-
-          const deltaX = interactionX - shapeCenterX;
-          const deltaY = interactionY - shapeCenterY;
-          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-          // Reduce interaction distance on mobile for better touch experience
-          const maxDistance = isMobile ? 150 : 200;
-
-          if (distance < maxDistance) {
-            const angle = Math.atan2(deltaY, deltaX);
-            const moveMultiplier = isMobile ? 0.05 : 0.1; // Reduce movement on mobile
-            const moveX = Math.cos(angle) * (maxDistance - distance) * moveMultiplier;
-            const moveY = Math.sin(angle) * (maxDistance - distance) * moveMultiplier;
-
-            shape.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(1.1)`;
-          } else {
-            shape.style.transform = "translate3d(0, 0, 0) scale(1)";
-          }
-        });
-      });
-    }
-
-    // Mouse interaction for desktop
-    if (!isMobile) {
-      document.addEventListener("mousemove", (e) => {
-        handleInteraction(e.clientX, e.clientY);
-      });
-    }
-
-    // Touch interaction for mobile
-    if (isMobile) {
-      let touchTimeout;
-
-      document.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        handleInteraction(touch.clientX, touch.clientY);
-      }, { passive: false });
-
-      document.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        handleInteraction(touch.clientX, touch.clientY);
-
-        // Clear any existing timeout
-        if (touchTimeout) {
-          clearTimeout(touchTimeout);
+    // FIXED: Simplified resize handling to prevent conflicts
+    function initializeResizeHandler() {
+      let resizeTimeout;
+      
+      window.addEventListener("resize", () => {
+        if (resizeTimeout) {
+          clearTimeout(resizeTimeout);
         }
 
-        // Reset shapes after touch ends
-        touchTimeout = setTimeout(() => {
-          const shapes = document.querySelectorAll(".geometric-shape");
-          shapes.forEach((shape) => {
-            shape.style.transform = "translate3d(0, 0, 0) scale(1)";
-          });
-        }, 100);
-      }, { passive: false });
-
-      document.addEventListener("touchend", (e) => {
-        // Reset shapes when touch ends
-        setTimeout(() => {
-          const shapes = document.querySelectorAll(".geometric-shape");
-          shapes.forEach((shape) => {
-            shape.style.transform = "translate3d(0, 0, 0) scale(1)";
-          });
-        }, 50);
+        // FIXED: Single setTimeout debounce without requestAnimationFrame wrapper
+        resizeTimeout = setTimeout(() => {
+          // Only recreate particles on resize, keep other initialization
+          const particleContainer = document.getElementById("particles");
+          if (particleContainer) {
+            particleContainer.innerHTML = '';
+          }
+          createParticles();
+        }, 250);
       });
     }
 
-    // Optimized geometric shape click/tap interactions
-    document.querySelectorAll(".geometric-shape").forEach((shape) => {
-      // Add hardware acceleration to shapes
-      shape.style.transform = "translateZ(0)";
-      shape.style.backfaceVisibility = "hidden";
-      shape.style.willChange = "transform";
-
-      const handleShapeInteraction = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const dept = shape.dataset.dept;
-
-        // Disable current animations
-        shape.style.animation = "none";
-        shape.style.transition = "transform 0.5s ease";
-
-        // Use transform3d for better performance
-        shape.style.transform = "scale(1.5) rotate(360deg) translateZ(0)";
-
-        setTimeout(() => {
-          shape.style.animation = "float 8s ease-in-out infinite";
-          shape.style.transform = "scale(1) rotate(0deg) translateZ(0)";
-          shape.style.transition = "";
-        }, 500);
-      };
-
-      // Add both click and touch events
-      shape.addEventListener("click", handleShapeInteraction);
-
-      if (isMobile) {
-        shape.addEventListener("touchstart", handleShapeInteraction, { passive: false });
-      }
-    });
-
-    // Performance optimization: Reduce animations on low-performance devices
-    if (isLowPerformance) {
-      document.documentElement.style.setProperty('--animation-duration', '12s');
-      document.documentElement.style.setProperty('--particle-animation-duration', '15s');
-    }
-
-    // Optimize particles creation on window resize
-    let resizeTimeout;
-    window.addEventListener("resize", () => {
-      if (resizeTimeout) {
-        clearTimeout(resizeTimeout);
-      }
-
-      resizeTimeout = setTimeout(() => {
-        createParticles();
-      }, 250);
-    });
-
-    // Initialize particles when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', createParticles);
-    } else {
-      createParticles();
-    }
-
-    // Cleanup on page unload
-    window.addEventListener("beforeunload", () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    });
-
-    // Initialize
-    document.addEventListener("DOMContentLoaded", () => {
-      createParticles();
-    });
-
-    // Responsive particle adjustment
-    window.addEventListener("resize", () => {
-      const particleContainer = document.getElementById("particles");
-      particleContainer.innerHTML = "";
-      createParticles();
-    });
-    document.addEventListener("DOMContentLoaded", function () {
-      const hamburger = document.querySelector(".hamburger");
-      const navbar = document.querySelector(".navbar");
-      const navLinks = document.querySelectorAll("#nav-links a");
-
-      // Toggle navigation menu and hamburger animation on click
-      if (hamburger && navbar) {
-        hamburger.addEventListener("click", () => {
-          navbar.classList.toggle("nav-open");
-          hamburger.classList.toggle("active");
-        });
-        // Keyboard accessibility
-        hamburger.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            navbar.classList.toggle("nav-open");
-            hamburger.classList.toggle("active");
-          }
-        });
-      }
-
-      // Close navigation menu and reset hamburger when a link is clicked (mobile UX)
-      if (navbar && hamburger) {
-        navLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            navbar.classList.remove("nav-open");
-            hamburger.classList.remove("active");
+    // FIXED: Enhanced Page Visibility API with proper shape state management
+    function initializeVisibilityHandler() {
+      document.addEventListener("visibilitychange", () => {
+        const particles = document.querySelectorAll(".particle");
+        const shapes = document.querySelectorAll(".geometric-shape");
+        
+        if (document.hidden) {
+          // Pause all animations when tab is hidden
+          particles.forEach(p => {
+            p.style.animationPlayState = "paused";
           });
-        });
+          shapes.forEach(s => {
+            s.style.animationPlayState = "paused";
+          });
+          // Cancel any pending animation frames
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+          }
+        } else {
+          // FIXED: Properly resume animations and reset shape states
+          particles.forEach(p => {
+            p.style.animationPlayState = "running";
+          });
+          shapes.forEach(s => {
+            s.style.animationPlayState = "running";
+            // Reset any stuck transforms
+            s.style.transform = "perspective(600px) translate3d(0, 0, 0) scale(1)";
+            s.classList.remove("float-animation");
+            // Re-add float animation
+            requestAnimationFrame(() => {
+              s.classList.add("float-animation");
+            });
+          });
+        }
+      });
+    }
+
+    // Dark mode support
+    function initializeDarkMode() {
+      if (prefersDarkMode) {
+        document.documentElement.classList.add('dark-theme');
       }
-    });
+      
+      // Listen for dark mode changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (e.matches) {
+          document.documentElement.classList.add('dark-theme');
+        } else {
+          document.documentElement.classList.remove('dark-theme');
+        }
+      });
+    }
+
+    // Performance optimization based on device capabilities
+    function applyPerformanceOptimizations() {
+      const root = document.documentElement;
+      
+      if (isLowPerformance) {
+        root.style.setProperty('--animation-duration', '15s');
+        root.style.setProperty('--particle-animation-duration', '20s');
+      }
+      
+      if (hasReducedMotion) {
+        root.style.setProperty('--animation-duration', '0s');
+        root.style.setProperty('--particle-animation-duration', '0s');
+      }
+    }
+
+    // FIXED: Single, clean initialization function
+    function initialize() {
+      // Prevent double initialization
+      if (isInitialized) return;
+      isInitialized = true;
+
+      // Clean up any existing state
+      cleanup();
+
+      // Initialize all components
+      initializeLogoIntro();
+      createParticles();
+      initializeShapes();
+      initializeNavigation();
+      initializeDesktopInteraction();
+      initializeMobileInteraction();
+      initializeResizeHandler();
+      initializeVisibilityHandler();
+      initializeDarkMode();
+      applyPerformanceOptimizations();
+    }
+
+    // Single DOMContentLoaded event listener
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+      initialize();
+    }
+
+    // Proper cleanup on page unload
+    window.addEventListener("beforeunload", cleanup);
   </script>
 </body>
 
